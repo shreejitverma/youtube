@@ -19,7 +19,7 @@ extension.features.bluelight = function () {
 	var value = extension.storage.get('bluelight');
 
 	if (extension.features.schedule() === false) {
-		return false;
+		value = 0;
 	}
 
 	if (!value) {
@@ -82,7 +82,7 @@ extension.features.bluelight = function () {
 
 extension.features.dim = function () {
 	var value = extension.storage.get('dim');
-	if (extension.features.schedule() === false) { return false; }
+	if (extension.features.schedule() === false) { value = 0; }
 
 	if (!value) { value = 0; }
 	if (typeof value !== 'number') { value = Number(value); }
@@ -127,3 +127,14 @@ extension.features.schedule = function () {
 
 	return false;
 };
+
+/*--------------------------------------------------------------
+# SCHEDULE CHANGED
+--------------------------------------------------------------*/
+
+extension.events.on('storage-changed', function (data) {
+	if (['schedule', 'schedule_time_from', 'schedule_time_to'].includes(data.key)) {
+		extension.features.bluelight();
+		extension.features.dim();
+	}
+});
